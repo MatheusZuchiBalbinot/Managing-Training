@@ -31,7 +31,7 @@ def cadastreReceive():
             email = input(f"Insira o email de {name}: ")
             if validateEmail(email) == True:
                 weight = float(input(f"Insira, em quilogramas, o peso de {name}: "))
-                height = int(input(f"Insira a altura de {name}: "))
+                height = float(input(f"Insira a altura de {name}: "))
                 imc = calculatingIMC(weight, height)
                 studentCadastre(name, cpf, weight, height, email, imc)
                 print()
@@ -150,6 +150,7 @@ def deleteAllExercises(idStudent):
 
 # Consulta os dados de um Student.
 def viewStudent():
+    showStudents()
     search_by_name = input("Insinira o nome do aluno que desejas ver os dados: ")
     idStudent = searchStudentID(search_by_name)
     for i in range(len(registredStudent)):
@@ -175,45 +176,45 @@ def viewStudent():
 def updateData(idStudent):
     print("Se você inserir 0 o elemento previamente cadastrado se manterá!")
 
-    new_name = input(
-        f"O nome atualmente cadastrado é: {registredStudent[idStudent].name}. O que você deseja inserir no lugar?\n")
-    new_cpf = input(
-        f"O CPF atualmente cadastrado é: {registredStudent[idStudent].cpf}. O que você deseja inserir no lugar?\n")
-    new_weight = float(input(
-        f"O peso atualmente cadastrado é: {registredStudent[idStudent].weight}. O que você deseja inserir no lugar?\n"))
-    new_height = int(input(
-        f"A altura atualmente cadastrada é: {registredStudent[idStudent].height}. O que você deseja inserir no lugar?\n"))
-    new_email = input(
-        f"O email atualmente cadastrado é: {registredStudent[idStudent].email}. O que você deseja inserir no lugar?\n")
+    old_CPF = registredStudent[idStudent].cpf
+    old_email = registredStudent[idStudent].email
 
+    new_name = input(f"O nome atualmente cadastrado é: {registredStudent[idStudent].name}. O que você deseja inserir no lugar?\n")
     if new_name != "0":
         registredStudent[idStudent].name = new_name
-
+    new_cpf = input(f"O CPF atualmente cadastrado é: {registredStudent[idStudent].cpf}. O que você deseja inserir no lugar?\n")
     if new_cpf != "0":
         if (validateCPF(new_cpf) == True):
             registredStudent[idStudent].cpf = new_cpf
-            if new_email != "0":
-                if validateEmail(new_email) == True:
-                    registredStudent[idStudent].email = new_email
-                    if new_weight != 0:
-                        registredStudent[idStudent].weight = new_weight
-                        weight_change = True
+        else:
+            print("CPF Inválido!! Esse campo não será alterado.")
+            registredStudent[idStudent].cpf = old_CPF
+    
+    new_weight = float(input(f"O peso atualmente cadastrado é: {registredStudent[idStudent].weight}. O que você deseja inserir no lugar?\n"))
+    if new_weight != 0:
+        registredStudent[idStudent].weight = new_weight
+        weight_change = True
 
-                    if new_height != 0:
-                        registredStudent[idStudent].height = new_height
-                        height_change = True
-                    
-                    if height_change == True or weight_change == True or height_change == True and weight_change == True:
-                        registredStudent[idStudent].imc = calculatingIMC(registredStudent[idStudent].weight, registredStudent[idStudent].height)
-                
-                    print("Dados atualizados com sucesso!!")
-                else:
-                    print("Email inválido!!")
-                    mainMenu()
+    new_height = int(input(f"A altura atualmente cadastrada é: {registredStudent[idStudent].height}. O que você deseja inserir no lugar?\n"))
+    if new_height != 0:
+        registredStudent[idStudent].height = new_height
+        height_change = True
+
+    new_email = input(f"O email atualmente cadastrado é: {registredStudent[idStudent].email}. O que você deseja inserir no lugar?\n")
+    if new_email != "0":
+        if validateEmail(new_email) == True:
+            registredStudent[idStudent].email = new_email
+        else:
+            print("Email Inválido!! Esse campo não será alterado.")
+            registredStudent[idStudent].cpf = old_email
+
+    if height_change == True or weight_change == True or height_change == True and weight_change == True:
+        registredStudent[idStudent].imc = calculatingIMC(registredStudent[idStudent].weight, registredStudent[idStudent].height)
 
 # Exclui um Student.
 def deleteStudent():
     check_student_exists = 0
+    showStudents
     name_delete_student = input("Insira o nome do aluno que queres excluir: ")
     for i in registredStudent:
         if name_delete_student == i.name:
@@ -277,6 +278,7 @@ def mainMenu():
                 return True
             elif menu == 4:
                 print()
+                showStudents()
                 nameStudent = input("Insira o nome do aluno que desejais ver os dados: ")
                 idStudent = searchStudentID(nameStudent)
                 updateData(idStudent)
@@ -301,6 +303,7 @@ def mainMenu():
 
 # Menu Gerenciar Treino
 def menuManage():
+    showStudents()
     student_to_manage_workout = input("Insira o nome do Aluno que deseja gerenciar o treino: ")
     idStudent = searchStudentID(student_to_manage_workout)
     if idStudent != None:
@@ -312,6 +315,7 @@ def menuManage():
 
         elif menuManage == 2:
             print()
+            showStudentExercises(idStudent)
             Exercisename = input("Insira o nome do exercício que deseja alterar: ")
             print()
             alterExercise(idStudent, Exercisename)
@@ -337,16 +341,20 @@ def menuManage():
     else:
         print("Aluno não encontrado.")
 
-# def showStudents():
-#     if registredStudent == []:
-#         print("Não há, atualmente, nenhum aluno cadastrado!!")
+def showStudents():
+    if registredStudent == []:
+        print("Não há, atualmente, nenhum aluno cadastrado!!")
         
-#     else:
-#         print(f"Os alunos atualmente Cadastrados são: {len(registredStudent)}")
-#         for i in range(len(registredStudent)):
-#             print(f"Aluno {i}: {registredStudent[i].name}")
+    else:
+        print(f"A academia tem atualmente: {len(registredStudent)} alunos.")
+        for i in range(len(registredStudent)):
+            print(f"Aluno {i}: {registredStudent[i].name}")
 
-# def showStudentExercises(idStudent):
+def showStudentExercises(idStudent):
+    print(f"Os exercícios do Estudante {registredStudent[idStudent].name} são:")
+    for i in range(len(exerciseStudent[idStudent])):
+        print(f"Exercío {i}: {exerciseStudent[idStudent][i].exerciseName}")
+
     
 
 #                                      Funções para validar CPF e Email, e funções 
